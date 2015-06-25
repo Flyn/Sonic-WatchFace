@@ -1,0 +1,58 @@
+{
+    "uuid": "f459ee00-8f73-4516-866f-9a2a7da0400b",
+    "shortName": "SonicAnimatedWatchface",
+    "longName": "Sonic Animated Watchface",
+    "companyName": "Flyn",
+    "versionLabel": "1.0",
+    "sdkVersion": "3",
+    "targetPlatforms": ["basalt"],
+    "watchapp": {
+        "watchface": true
+    },
+    "appKeys": {
+        "dummy": 0
+    },
+    "resources": {
+        "media": [{
+            "type": "font",
+            "name": "FONT_SONIC_40",
+            "file": "fonts/sonic.ttf"
+        }, {
+            "type": "font",
+            "name": "FONT_SONIC_14",
+            "file": "fonts/sonic.ttf"
+        }, {
+            "type": "png",
+            "name": "IMAGE_BASEPOSE",
+            "file": "images/basepose.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM0",
+            "file": "images/stand.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM1",
+            "file": "images/impatient1.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM2",
+            "file": "images/impatient2.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM3",
+            "file": "images/impatient3.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM4",
+            "file": "images/impatient4.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_ANIM5",
+            "file": "images/impatient5.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_BACKGROUND",
+            "file": "images/background.png"
+        }]
+    }
+}
