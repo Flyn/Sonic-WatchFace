@@ -1,6 +1,6 @@
 {
     "uuid": "f459ee00-8f73-4516-866f-9a2a7da0400b",
-    "shortName": "SonicAnimatedWatchface",
+    "shortName": "Sonic Animated",
     "longName": "Sonic Animated Watchface",
     "companyName": "Flyn",
     "versionLabel": "1.0",
@@ -10,12 +10,15 @@
         "watchface": true
     },
     "appKeys": {
-        "dummy": 0
+        "KEY_TEMPERATURE": 0,
+        "KEY_WEATHER": 1,
+        "KEY_NIGHT": 2
     },
+    "capabilities": ["location"],
     "resources": {
         "media": [{
             "type": "font",
-            "name": "FONT_SONIC_40",
+            "name": "FONT_SONIC_38",
             "file": "fonts/sonic.ttf"
         }, {
             "type": "font",
@@ -25,6 +28,10 @@
             "type": "png",
             "name": "IMAGE_BASEPOSE",
             "file": "images/basepose.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAINPOSE",
+            "file": "images/lookingup.png"
         }, {
             "type": "png",
             "name": "IMAGE_ANIM0",
@@ -53,6 +60,42 @@
             "type": "png",
             "name": "IMAGE_BACKGROUND",
             "file": "images/background.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_SUNNY",
+            "file": "images/sunny.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_CLEARNIGHT",
+            "file": "images/clearnight.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_CLOUDYNIGHT",
+            "file": "images/cloudynight.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_CLOUDY",
+            "file": "images/cloudy.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAINY",
+            "file": "images/rainy.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAINYNIGHT",
+            "file": "images/rainynight.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAIN1",
+            "file": "images/rain1.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAIN2",
+            "file": "images/rain2.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_RAIN3",
+            "file": "images/rain3.png"
         }]
     }
 }
