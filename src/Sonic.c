@@ -1,4 +1,5 @@
 #include <pebble.h>
+#include <math.h>
 
 #define KEY_TEMPERATURE 0
 #define KEY_WEATHER 1
@@ -33,9 +34,8 @@ uint32_t current_rain_frame = 0;
 static GBitmap *s_anim_bitmap[MAX_FRAME];
 
 #define MAX_RAIN_FRAME 3
-static GBitmap *s_rain_anim_bitmap[MAX_RAIN_FRAME];
 
-static uint32_t animation[] = {0,1,2,3,4,3,4,3,4,3,3,5,5,5,5,3,3,4,3,4,3,4,3,1,0};
+static uint32_t animation[] = {0,1,3,4,3,4,3,4,3,3,5,5,5,5,3,3,4,3,4,3,4,3,1,0};
 
 static void update_time() {
     // Get a tm structure
@@ -70,14 +70,11 @@ static void animate() {
         current_frame ++;
 
         if (raining) {
-            bitmap_layer_set_bitmap(s_rain_layer, s_rain_anim_bitmap[current_rain_frame]);
             layer_mark_dirty(bitmap_layer_get_layer(s_rain_layer));
             current_rain_frame ++;
             if (current_rain_frame == MAX_RAIN_FRAME) {
                 current_rain_frame = 0;
             }
-        } else {
-            bitmap_layer_set_bitmap(s_rain_layer, NULL);
         }
 
         app_timer_register(delayms, animate, NULL);
@@ -105,7 +102,7 @@ static void start_anim() {
 static void load_anim() {
     s_anim_bitmap[0] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM0);
     s_anim_bitmap[1] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM1);
-    s_anim_bitmap[2] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM2);
+    //s_anim_bitmap[2] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM2);
     s_anim_bitmap[3] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM3);
     s_anim_bitmap[4] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM4);
     s_anim_bitmap[5] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_ANIM5);
@@ -118,17 +115,76 @@ static void free_anim() {
     }
 }
 
-static void load_rain_anim() {
-    s_rain_anim_bitmap[0] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAIN1);
-    s_rain_anim_bitmap[1] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAIN2);
-    s_rain_anim_bitmap[2] = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAIN3);
+static void draw_rainfall(GContext *ctx, int x, int y, int length) {
+    graphics_context_set_stroke_width(ctx, 2);
+    float angle = 2.0071286396850003;
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x + length * cos(angle), y + length * sin(angle)));
 }
 
-static void free_rain_anim() {
-    uint32_t i = 0;
-    for (i = 0 ; i < MAX_RAIN_FRAME; i++) {
-        gbitmap_destroy(s_rain_anim_bitmap[i]);
+static void draw_raindrop(GContext *ctx, int x, int y) {
+    graphics_context_set_stroke_width(ctx, 3);
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x - 4, y - 5));
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x - 4, y - 5));
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x + 2, y - 3));
+}
+
+static void draw_rain(Layer *bg_layer, GContext *ctx) {
+    if (! raining) {
+        return;
     }
+    graphics_context_set_stroke_color(ctx, GColorCobaltBlue);
+    graphics_context_set_antialiased(ctx, false);
+    if (current_rain_frame == 0) {
+        draw_rainfall(ctx, 12, 42, 10);
+        draw_rainfall(ctx, 28, 71, 15);
+        draw_rainfall(ctx, 36, 34, 22);
+        draw_rainfall(ctx, 42, 84, 16);
+        draw_rainfall(ctx, 60, 32, 25);
+        draw_rainfall(ctx, 96, 22, 27);
+        draw_rainfall(ctx, 76, 50, 23);
+        draw_rainfall(ctx, 84, 70, 15);
+        draw_rainfall(ctx, 100, 50, 22);
+        draw_rainfall(ctx, 122, 46, 18);
+        draw_rainfall(ctx, 122, 84, 8);
+        draw_rainfall(ctx, 142, 66, 5);
+        draw_raindrop(ctx, 16,107);
+        draw_raindrop(ctx, 100,108);
+    }
+    if (current_rain_frame == 1) {
+        draw_rainfall(ctx, 7, 76, 10);
+        draw_rainfall(ctx, 30, 68, 15);
+        draw_rainfall(ctx, 36, 38, 22);
+        draw_rainfall(ctx, 56, 51, 16);
+        draw_rainfall(ctx, 54, 56, 25);
+        draw_rainfall(ctx, 70, 83, 27);
+        draw_rainfall(ctx, 82, 25, 23);
+        draw_rainfall(ctx, 94, 84, 15);
+        draw_rainfall(ctx, 116, 80, 22);
+        draw_rainfall(ctx, 136, 38, 18);
+        draw_rainfall(ctx, 140, 64, 25);
+        draw_rainfall(ctx, 112, 55, 5);
+        draw_raindrop(ctx, 21,109);
+        draw_raindrop(ctx, 88,108);
+        draw_raindrop(ctx, 135,104);
+    }
+    if (current_rain_frame == 2) {
+        draw_rainfall(ctx, 8, 44, 10);
+        draw_rainfall(ctx, 26, 61, 15);
+        draw_rainfall(ctx, 54, 48, 22);
+        draw_rainfall(ctx, 64, 47, 6);
+        draw_rainfall(ctx, 94, 34, 25);
+        draw_rainfall(ctx, 80, 79, 17);
+        draw_rainfall(ctx, 134, 48, 23);
+        draw_rainfall(ctx, 110, 25, 28);
+        draw_rainfall(ctx, 44, 89, 12);
+        draw_rainfall(ctx, 72, 47, 18);
+        draw_rainfall(ctx, 104, 70, 15);
+        draw_rainfall(ctx, 20, 91, 5);
+        draw_raindrop(ctx, 16,104);
+        draw_raindrop(ctx, 104,104);
+        draw_raindrop(ctx, 127,103);
+    }
+
 }
 
 static void update_weather(uint32_t weather, bool night) {
@@ -195,11 +251,10 @@ static void main_window_load(Window *window) {
     layer_add_child(bitmap_layer_get_layer(s_background_layer), bitmap_layer_get_layer(s_sonic_layer));
 
     s_rain_layer = bitmap_layer_create(GRect(0, 0, 144, 168));
-    bitmap_layer_set_compositing_mode(s_rain_layer, GCompOpSet);
     layer_add_child(bitmap_layer_get_layer(s_background_layer), bitmap_layer_get_layer(s_rain_layer));
+    layer_set_update_proc(bitmap_layer_get_layer(s_rain_layer), draw_rain);
 
     load_anim();
-    //load_rain_anim();
 
     // Create time TextLayer
     s_time_layer = text_layer_create(GRect(2, 108, 139, 50));
@@ -256,7 +311,6 @@ static void main_window_unload(Window *window) {
     gbitmap_destroy(s_background_bitmap);
     gbitmap_destroy(s_basepose_bitmap);
     free_anim();
-    free_rain_anim();
 
     // Destroy BitmapLayer
     bitmap_layer_destroy(s_background_layer);

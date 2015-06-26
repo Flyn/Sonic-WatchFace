@@ -84,18 +84,6 @@
             "type": "png",
             "name": "IMAGE_RAINYNIGHT",
             "file": "images/rainynight.png"
-        }, {
-            "type": "png",
-            "name": "IMAGE_RAIN1",
-            "file": "images/rain1.png"
-        }, {
-            "type": "png",
-            "name": "IMAGE_RAIN2",
-            "file": "images/rain2.png"
-        }, {
-            "type": "png",
-            "name": "IMAGE_RAIN3",
-            "file": "images/rain3.png"
         }]
     }
 }
