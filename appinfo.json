@@ -34,6 +34,14 @@
             "file": "images/lookingup.png"
         }, {
             "type": "png",
+            "name": "IMAGE_THUNDERPOSE",
+            "file": "images/crouch.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_SNOWPOSE",
+            "file": "images/snow.png"
+        }, {
+            "type": "png",
             "name": "IMAGE_ANIM0",
             "file": "images/stand.png"
         }, {
@@ -84,6 +92,14 @@
             "type": "png",
             "name": "IMAGE_RAINYNIGHT",
             "file": "images/rainynight.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_SNOWY",
+            "file": "images/snowy.png"
+        }, {
+            "type": "png",
+            "name": "IMAGE_SNOWYNIGHT",
+            "file": "images/snowynight.png"
         }]
     }
 }

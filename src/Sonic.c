@@ -23,6 +23,7 @@ static BitmapLayer *s_rain_layer;
 static bool animated = false;
 static bool raining = false;
 static bool thunder = false;
+static bool snow = false;
 
 static uint32_t current_weather = 0;
 static bool current_night = false;
@@ -63,14 +64,15 @@ static void update_time() {
     text_layer_set_text(s_date_layer, date_buffer);
 }
 
-
 static void animate() {
     if (current_frame < NELEMS(animation)) {
-        bitmap_layer_set_bitmap(s_sonic_layer, s_anim_bitmap[animation[current_frame]]);
-        layer_mark_dirty(bitmap_layer_get_layer(s_sonic_layer));
+        if (!(thunder || snow)) {
+            bitmap_layer_set_bitmap(s_sonic_layer, s_anim_bitmap[animation[current_frame]]);
+            layer_mark_dirty(bitmap_layer_get_layer(s_sonic_layer));
+        }
         current_frame ++;
 
-        if (raining) {
+        if (raining || snow) {
             layer_mark_dirty(bitmap_layer_get_layer(s_rain_layer));
             current_rain_frame ++;
             if (current_rain_frame == MAX_RAIN_FRAME) {
@@ -89,8 +91,15 @@ static void animate() {
             } else {
                 s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAINPOSE);
             }
+        } else if (snow) {
+            s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SNOWPOSE);
         } else {
             s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BASEPOSE);
+        }
+        if (snow) {
+            layer_set_frame(bitmap_layer_get_layer(s_sonic_layer), GRect(5, 24, 128, 94));
+        } else {
+            layer_set_frame(bitmap_layer_get_layer(s_sonic_layer), GRect(42, 34, 64, 80));
         }
         bitmap_layer_set_bitmap(s_sonic_layer, s_basepose_bitmap);
         layer_mark_dirty(bitmap_layer_get_layer(s_sonic_layer));
@@ -133,68 +142,83 @@ static void draw_raindrop(GContext *ctx, int x, int y) {
     graphics_draw_line(ctx, GPoint(x,y), GPoint(x + 2, y - 3));
 }
 
-static void draw_rain(Layer *bg_layer, GContext *ctx) {
-    if (! raining) {
-        return;
-    }
-    if (thunder && (current_frame % 8) == 1) {
-        graphics_context_set_fill_color(ctx, GColorWhite);
-        graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, 0);
-        return;
-    }
-    graphics_context_set_stroke_color(ctx, GColorCobaltBlue);
-    graphics_context_set_antialiased(ctx, false);
-    if (current_rain_frame == 0) {
-        draw_rainfall(ctx, 12, 42, 10);
-        draw_rainfall(ctx, 28, 71, 15);
-        draw_rainfall(ctx, 36, 34, 22);
-        draw_rainfall(ctx, 42, 84, 16);
-        draw_rainfall(ctx, 60, 32, 25);
-        draw_rainfall(ctx, 96, 22, 27);
-        draw_rainfall(ctx, 76, 50, 23);
-        draw_rainfall(ctx, 84, 70, 15);
-        draw_rainfall(ctx, 100, 50, 22);
-        draw_rainfall(ctx, 122, 46, 18);
-        draw_rainfall(ctx, 122, 84, 8);
-        draw_rainfall(ctx, 142, 66, 5);
-        draw_raindrop(ctx, 16,107);
-        draw_raindrop(ctx, 100,108);
-    }
-    if (current_rain_frame == 1) {
-        draw_rainfall(ctx, 7, 76, 10);
-        draw_rainfall(ctx, 30, 68, 15);
-        draw_rainfall(ctx, 36, 38, 22);
-        draw_rainfall(ctx, 56, 51, 16);
-        draw_rainfall(ctx, 54, 56, 25);
-        draw_rainfall(ctx, 70, 83, 27);
-        draw_rainfall(ctx, 82, 25, 23);
-        draw_rainfall(ctx, 94, 84, 15);
-        draw_rainfall(ctx, 116, 80, 22);
-        draw_rainfall(ctx, 136, 38, 18);
-        draw_rainfall(ctx, 140, 64, 25);
-        draw_rainfall(ctx, 112, 55, 5);
-        draw_raindrop(ctx, 21,109);
-        draw_raindrop(ctx, 88,108);
-        draw_raindrop(ctx, 135,104);
-    }
-    if (current_rain_frame == 2) {
-        draw_rainfall(ctx, 8, 44, 10);
-        draw_rainfall(ctx, 26, 61, 15);
-        draw_rainfall(ctx, 54, 48, 22);
-        draw_rainfall(ctx, 64, 47, 6);
-        draw_rainfall(ctx, 94, 34, 25);
-        draw_rainfall(ctx, 80, 79, 17);
-        draw_rainfall(ctx, 134, 48, 23);
-        draw_rainfall(ctx, 110, 25, 28);
-        draw_rainfall(ctx, 44, 89, 12);
-        draw_rainfall(ctx, 72, 47, 18);
-        draw_rainfall(ctx, 104, 70, 15);
-        draw_rainfall(ctx, 20, 91, 5);
-        draw_raindrop(ctx, 16,104);
-        draw_raindrop(ctx, 104,104);
-        draw_raindrop(ctx, 127,103);
-    }
+static void draw_snowflake(GContext *ctx, int x, int y) {
+    graphics_context_set_stroke_width(ctx, 1 + rand() % 3);
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x, y - 1));
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x, y + 1));
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x + 1, y));
+    graphics_draw_line(ctx, GPoint(x,y), GPoint(x - 1, y));
+}
 
+static void draw_rain(Layer *bg_layer, GContext *ctx) {
+    if (raining) {
+        if (thunder && (current_frame % 8) == 1) {
+            graphics_context_set_fill_color(ctx, GColorWhite);
+            graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, 0);
+            return;
+        }
+        graphics_context_set_stroke_color(ctx, GColorCobaltBlue);
+        graphics_context_set_antialiased(ctx, false);
+        if (current_rain_frame == 0) {
+            draw_rainfall(ctx, 12, 42, 10);
+            draw_rainfall(ctx, 28, 71, 15);
+            draw_rainfall(ctx, 36, 34, 22);
+            draw_rainfall(ctx, 42, 84, 16);
+            draw_rainfall(ctx, 60, 32, 25);
+            draw_rainfall(ctx, 96, 22, 27);
+            draw_rainfall(ctx, 76, 50, 23);
+            draw_rainfall(ctx, 84, 70, 15);
+            draw_rainfall(ctx, 100, 50, 22);
+            draw_rainfall(ctx, 122, 46, 18);
+            draw_rainfall(ctx, 122, 84, 8);
+            draw_rainfall(ctx, 142, 66, 5);
+            draw_raindrop(ctx, 16,107);
+            draw_raindrop(ctx, 100,108);
+        }
+        if (current_rain_frame == 1) {
+            draw_rainfall(ctx, 7, 76, 10);
+            draw_rainfall(ctx, 30, 68, 15);
+            draw_rainfall(ctx, 36, 38, 22);
+            draw_rainfall(ctx, 56, 51, 16);
+            draw_rainfall(ctx, 54, 56, 25);
+            draw_rainfall(ctx, 70, 83, 27);
+            draw_rainfall(ctx, 82, 25, 23);
+            draw_rainfall(ctx, 94, 84, 15);
+            draw_rainfall(ctx, 116, 80, 22);
+            draw_rainfall(ctx, 136, 38, 18);
+            draw_rainfall(ctx, 140, 64, 25);
+            draw_rainfall(ctx, 112, 55, 5);
+            draw_raindrop(ctx, 21,109);
+            draw_raindrop(ctx, 88,108);
+            draw_raindrop(ctx, 135,104);
+        }
+        if (current_rain_frame == 2) {
+            draw_rainfall(ctx, 8, 44, 10);
+            draw_rainfall(ctx, 26, 61, 15);
+            draw_rainfall(ctx, 54, 48, 22);
+            draw_rainfall(ctx, 64, 47, 6);
+            draw_rainfall(ctx, 94, 34, 25);
+            draw_rainfall(ctx, 80, 79, 17);
+            draw_rainfall(ctx, 134, 48, 23);
+            draw_rainfall(ctx, 110, 25, 28);
+            draw_rainfall(ctx, 44, 89, 12);
+            draw_rainfall(ctx, 72, 47, 18);
+            draw_rainfall(ctx, 104, 70, 15);
+            draw_rainfall(ctx, 20, 91, 5);
+            draw_raindrop(ctx, 16,104);
+            draw_raindrop(ctx, 104,104);
+            draw_raindrop(ctx, 127,103);
+        }
+        return;
+    }
+    if (snow) {
+        graphics_context_set_stroke_color(ctx, GColorWhite);
+        graphics_context_set_antialiased(ctx, false);
+        for (int i = 0 ; i < 20 ; i++) {
+            draw_snowflake(ctx, rand() % 144, rand() % 100);
+        }
+        return;
+    }
 }
 
 static void update_weather(uint32_t weather, bool night) {
@@ -239,7 +263,14 @@ static void update_weather(uint32_t weather, bool night) {
         if (weather == 11) {
             thunder = true;
         }
-    } else {
+    } else if (weather == 13) {
+        if (night) {
+            s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SNOWYNIGHT);
+        } else {
+            s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_SNOWY);
+        }
+        snow = true;
+    }  else {
         s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND);
     }
 
