@@ -20,8 +20,9 @@ static GBitmap *s_background_bitmap;
 static BitmapLayer *s_sonic_layer;
 static GBitmap *s_basepose_bitmap;
 static BitmapLayer *s_rain_layer;
-bool animated = false;
-bool raining = false;
+static bool animated = false;
+static bool raining = false;
+static bool thunder = false;
 
 static uint32_t current_weather = 0;
 static bool current_night = false;
@@ -83,7 +84,11 @@ static void animate() {
         animated = false;
         gbitmap_destroy(s_basepose_bitmap);
         if (raining) {
-            s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAINPOSE);
+            if (thunder) {
+                s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_THUNDERPOSE);
+            } else {
+                s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAINPOSE);
+            }
         } else {
             s_basepose_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BASEPOSE);
         }
@@ -130,6 +135,11 @@ static void draw_raindrop(GContext *ctx, int x, int y) {
 
 static void draw_rain(Layer *bg_layer, GContext *ctx) {
     if (! raining) {
+        return;
+    }
+    if (thunder && (current_frame % 8) == 1) {
+        graphics_context_set_fill_color(ctx, GColorWhite);
+        graphics_fill_rect(ctx, GRect(0, 0, 144, 168), 0, 0);
         return;
     }
     graphics_context_set_stroke_color(ctx, GColorCobaltBlue);
@@ -190,6 +200,7 @@ static void draw_rain(Layer *bg_layer, GContext *ctx) {
 static void update_weather(uint32_t weather, bool night) {
 
     raining = false;
+    thunder = false;
 
     if (weather == current_weather && night == current_night) {
         return;
@@ -225,6 +236,9 @@ static void update_weather(uint32_t weather, bool night) {
             s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_RAINY);
         }
         raining = true;
+        if (weather == 11) {
+            thunder = true;
+        }
     } else {
         s_background_bitmap = gbitmap_create_with_resource(RESOURCE_ID_IMAGE_BACKGROUND);
     }
