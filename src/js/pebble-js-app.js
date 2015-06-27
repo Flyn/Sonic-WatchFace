@@ -75,3 +75,14 @@ Pebble.addEventListener('appmessage',
     getWeather();
   }
 );
+
+Pebble.addEventListener('showConfiguration', function(e) {
+  // Show config page
+  var pagecode = 'PGh0bWw+Cjxib2R5PgogICAgPHNjcmlwdD4KICAgICAgICB2YXIgYWNjZXB0ID0gZnVuY3Rpb24oKSB7CiAgICAgICAgICAgIHZhciBzZXR0aW5ncyA9IHt9OwogICAgICAgICAgICBzZXR0aW5ncy53cmlzdCA9ICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnd3Jpc3QnKS5jaGVja2VkOwogICAgICAgICAgICBsb2NhdGlvbi5ocmVmID0gJ3BlYmJsZWpzOi8vY2xvc2UjJyArIGVuY29kZVVSSUNvbXBvbmVudChKU09OLnN0cmluZ2lmeShzZXR0aW5ncykpOwogICAgICAgIH0KICAgIDwvc2NyaXB0PgogICAgPGgyPkNvbmZpZyBQZWJibGUgITwvaDI+CiAgICA8Zm9ybSBpZD0icGViYmxlZm9ybSIgb25zdWJtaXQ9ImFjY2VwdCh0aGlzKTtyZXR1cm4gZmFsc2U7IiA+CiAgICAgICAgPGxhYmVsPlZpYnJhdGUgb24gd3Jpc3QgZmxpY2sgOjwvbGFiZWw+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBpZD0id3Jpc3QiPgogICAgPC9mb3JtPgogICAgPGJ1dHRvbiBvbmNsaWNrPSJhY2NlcHQoKSI+QWNjZXB0PC9idXR0b24+CjwvYm9keT4KPC9odG1sPg==';
+  Pebble.openURL('data:text/html,'+ atob(pagecode) +'<!--.html');
+})
+
+Pebble.addEventListener('webviewclosed', function(e) {
+    var configuration = JSON.parse(decodeURIComponent(e.response));
+    Pebble.sendAppMessage(configuration);
+});

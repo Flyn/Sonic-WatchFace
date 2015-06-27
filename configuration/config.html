@@ -1,0 +1,16 @@
+<html>
+<body>
+    <script>
+        var accept = function() {
+            var settings = {};
+            settings.wrist =  document.getElementById('wrist').checked;
+            location.href = 'pebblejs://close#' + encodeURIComponent(JSON.stringify(settings));
+        }
+    </script>
+    <h2>Config Pebble !</h2>
+    <form id="pebbleform" onsubmit="accept(this);return false;" >
+        <label>Vibrate on wrist flick :</label><input type="checkbox" id="wrist">
+    </form>
+    <button onclick="accept()">Accept</button>
+</body>
+</html>

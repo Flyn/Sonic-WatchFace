@@ -14,7 +14,7 @@
         "KEY_WEATHER": 1,
         "KEY_NIGHT": 2
     },
-    "capabilities": ["location"],
+    "capabilities": ["location", "configurable"],
     "resources": {
         "media": [{
             "type": "font",
